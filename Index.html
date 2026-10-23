@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>101 - Interactive Experience</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body {
+            background-color: #0d0f12;
+            color: #ffffff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Canvas de partículas de fondo */
+        #particleCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        /* Contenedor principal */
+        .main-container {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 50px;
+        }
+
+        /* Área interactiva del número 101 */
+        .number-group {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            justify-content: center;
+            perspective: 1000px;
+        }
+
+        /* Cada dígito (1, 0, 1) */
+        .digit-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .digit {
+            font-size: 14rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #6366f1, #a855f7, #ec4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            cursor: pointer;
+            transition: transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275), filter 0.3s ease;
+            filter: drop-shadow(0 0 20px rgba(168, 85, 247, 0.4));
+            position: relative;
+            line-height: 1;
+        }
+
+        /* Efectos al pasar el ratón sobre los números */
+        .digit:hover {
+            transform: scale(1.15) translateZ(30px) rotate(calc(var(--rand-rot, 1) * 5deg));
+            filter: drop-shadow(0 0 35px rgba(236, 72, 153, 0.8));
+        }
+
+        .digit:active {
+            transform: scale(0.95);
+        }
+
+        /* Botones debajo de cada dígito */
+        .action-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .action-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: #a855f7;
+            box-shadow: 0 0 20px rgba(168, 85, 247, 0.6);
+            transform: translateY(-3px);
+        }
+
+        .action-btn:active {
+            transform: translateY(1px);
+        }
+
+        /* Efecto de explosión de ondas al pulsar */
+        .shockwave {
+            position: absolute;
+            border-radius: 50%;
+            border: 2px solid #a855f7;
+            transform: scale(0);
+            animation: ripple 0.6s linear forwards;
+            pointer-events: none;
+        }
+
+        @keyframes ripple {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Canvas para los efectos visuales/partículas -->
+    <canvas id="particleCanvas"></canvas>
+
+    <div class="main-container">
+        <!-- Bloque de números interactivos -->
+        <div class="number-group">
+            
+            <!-- Dígito 1 (Primero) -->
+            <div class="digit-wrapper">
+                <div class="digit" id="digit1" data-index="1">1</div>
+                <button class="action-btn" id="btn1">Boton 1</button>
+            </div>
+
+            <!-- Dígito 0 (Centro) -->
+            <div class="digit-wrapper">
+                <div class="digit" id="digit0" data-index="2">0</div>
+                <button class="action-btn" id="btn2">Boton 2</button>
+            </div>
+
+            <!-- Dígito 1 (Tercero) -->
+            <div class="digit-wrapper">
+                <div class="digit" id="digit2" data-index="3">1</div>
+                <button class="action-btn" id="btn3">Boton 3</button>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // --- INTERACTIVIDAD Y ANIMACIONES ---
+
+        const digits = document.querySelectorAll('.digit');
+        const canvas = document.getElementById('particleCanvas');
+        const ctx = canvas.getContext('2d');
+
+        let particles = [];
+
+        // Ajustar tamaño del Canvas
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        // Clase Partícula
+        class Particle {
+            constructor(x, y, color) {
+                this.x = x;
+                this.y = y;
+                this.size = Math.random() * 5 + 2;
+                this.speedX = (Math.random() - 0.5) * 8;
+                this.speedY = (Math.random() - 0.5) * 8;
+                this.color = color;
+                this.alpha = 1;
+            }
+
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                this.alpha -= 0.02;
+            }
+
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = this.alpha;
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        // Crear partículas en click
+        function createExplosion(x, y) {
+            const colors = ['#6366f1', '#a855f7', '#ec4899', '#ffffff'];
+            for (let i = 0; i < 35; i++) {
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                particles.push(new Particle(x, y, color));
+            }
+        }
+
+        // Bucle de animación del Canvas
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach((p, index) => {
+                p.update();
+                p.draw();
+                if (p.alpha <= 0) particles.splice(index, 1);
+            });
+            requestAnimationFrame(animateParticles);
+        }
+        animateParticles();
+
+        // Eventos de click en los Números
+        digits.forEach(digit => {
+            // Rotación aleatoria al pasar el ratón
+            digit.addEventListener('mouseenter', () => {
+                digit.style.setProperty('--rand-rot', (Math.random() > 0.5 ? 1 : -1));
+            });
+
+            // Explosión de partículas al pulsar
+            digit.addEventListener('click', (e) => {
+                const rect = digit.getBoundingClientRect();
+                const x = rect.left + rect.width / 2;
+                const y = rect.top + rect.height / 2;
+                
+                createExplosion(x, y);
+
+                // Animación extra de rebote
+                digit.style.transform = 'scale(1.4) rotate(15deg)';
+                setTimeout(() => {
+                    digit.style.transform = '';
+                }, 200);
+            });
+        });
+
+        // Configuración de los botones (Eventos iniciales)
+        document.getElementById('btn1').addEventListener('click', () => {
+            alert('Has pulsado el Botón 1');
+        });
+
+        document.getElementById('btn2').addEventListener('click', () => {
+            alert('Has pulsado el Botón 2');
+        });
+
+        document.getElementById('btn3').addEventListener('click', () => {
+            alert('Has pulsado el Botón 3');
+        });
+    </script>
+</body>
+</html>
