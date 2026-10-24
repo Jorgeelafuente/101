@@ -2,32 +2,34 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>101 • Experiencia Inmersiva</title>
-    <!-- Importamos fuentes modernas de Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;600;900&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>101 • Interactive Physics Playground</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
             user-select: none;
+            -webkit-user-select: none;
+            -webkit-touch-callout: none;
         }
 
         body {
-            background-color: #060709;
+            background-color: #030407;
             color: #ffffff;
             font-family: 'Outfit', sans-serif;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
+            width: 100vw;
+            height: 100vh;
             overflow: hidden;
             position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        /* Canvas de partículas dinámicas de fondo */
+        /* Canvas de partículas de fondo para mayor profundidad */
         #bgCanvas {
             position: absolute;
             top: 0;
@@ -38,108 +40,106 @@
             pointer-events: none;
         }
 
-        /* Viñeta de iluminación ambiental */
+        /* Capa de viñeta ambiental con gradientes profundos */
         .ambient-glow {
             position: absolute;
-            width: 600px;
-            height: 600px;
-            background: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, rgba(168, 85, 247, 0.05) 50%, transparent 70%);
+            inset: 0;
+            background: radial-gradient(circle at 50% 40%, rgba(99, 102, 241, 0.08) 0%, rgba(168, 85, 247, 0.03) 40%, transparent 80%);
             z-index: 2;
             pointer-events: none;
-            transition: transform 0.5s ease-out;
         }
 
-        /* Contenedor principal de la interfaz */
-        .main-container {
-            position: relative;
-            z-index: 10;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 60px;
-        }
-
-        /* Grupo de números con perspectiva 3D */
-        .number-group {
-            display: flex;
-            gap: 30px;
-            align-items: center;
-            justify-content: center;
-            perspective: 1200px;
-        }
-
-        /* Contenedor individual de cada dígito y su botón */
-        .digit-column {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 24px;
-            transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1);
-        }
-
-        /* Estilo profesional de los números 1, 0, 1 */
-        .digit {
-            font-size: 13rem;
-            font-weight: 900;
-            background: linear-gradient(135deg, #ffffff 20%, #a855f7 60%, #6366f1 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            cursor: pointer;
-            line-height: 1;
-            transition: filter 0.3s ease;
-            filter: drop-shadow(0 10px 30px rgba(108, 99, 255, 0.25));
-            transform-style: preserve-3d;
-        }
-
-        .digit:hover {
-            filter: drop-shadow(0 0 45px rgba(168, 85, 247, 0.7));
-        }
-
-        /* Botones minimalistas de vidrio esmerilado (Glassmorphism) */
-        .action-btn {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            color: #94a3b8;
-            padding: 14px 28px;
-            border-radius: 14px;
-            font-size: 0.95rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-            letter-spacing: 1.5px;
-            text-transform: uppercase;
-        }
-
-        .action-btn:hover {
-            background: rgba(168, 85, 247, 0.15);
-            border-color: rgba(168, 85, 247, 0.5);
-            color: #ffffff;
-            box-shadow: 0 0 25px rgba(168, 85, 247, 0.3);
-            transform: translateY(-4px);
-        }
-
-        .action-btn:active {
-            transform: translateY(-1px);
-        }
-
-        /* Ventana Modal Interactiva para los botones */
-        .modal-overlay {
-            position: fixed;
+        /* Contenedor de los números interactivos (Zona de juego física) */
+        #physicsPlayground {
+            position: absolute;
             top: 0;
             left: 0;
             width: 100%;
-            height: 100%;
-            background: rgba(6, 7, 9, 0.8);
+            height: 80%;
+            z-index: 10;
+            overflow: hidden;
+        }
+
+        /* Estilo de cada dígito interactivo flotante */
+        .interactive-digit {
+            position: absolute;
+            font-weight: 900;
+            font-size: 8rem;
+            background: linear-gradient(135deg, #ffffff 20%, #c084fc 60%, #6366f1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            cursor: grab;
+            display: inline-block;
+            line-height: 1;
+            filter: drop-shadow(0 15px 35px rgba(108, 99, 255, 0.3));
+            transition: filter 0.2s ease;
+            touch-action: none;
+            will-change: transform, left, top;
+        }
+
+        .interactive-digit:active {
+            cursor: grabbing;
+        }
+
+        /* Panel inferior flotante para los 3 botones */
+        .bottom-nav {
+            position: relative;
+            z-index: 20;
+            width: 100%;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            background: linear-gradient(to top, rgba(3, 4, 7, 0.95) 50%, transparent);
+        }
+
+        .action-btn {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            color: #cbd5e1;
+            padding: 12px 20px;
+            border-radius: 16px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+            flex: 1;
+            max-width: 130px;
+            text-align: center;
+        }
+
+        .action-btn:hover {
+            background: rgba(168, 85, 247, 0.2);
+            border-color: rgba(168, 85, 247, 0.6);
+            color: #ffffff;
+            box-shadow: 0 0 25px rgba(168, 85, 247, 0.4);
+            transform: translateY(-3px);
+        }
+
+        .action-btn:active {
+            transform: translateY(0);
+        }
+
+        /* Ventana Modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(3, 4, 7, 0.85);
+            backdrop-filter: blur(20px);
             z-index: 100;
             display: flex;
             justify-content: center;
             align-items: center;
             opacity: 0;
             pointer-events: none;
-            transition: opacity 0.4s ease;
+            transition: opacity 0.3s ease;
+            padding: 20px;
         }
 
         .modal-overlay.active {
@@ -148,16 +148,16 @@
         }
 
         .modal-content {
-            background: rgba(18, 20, 26, 0.85);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 40px;
+            background: rgba(18, 20, 28, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            padding: 30px;
             border-radius: 24px;
-            width: 90%;
-            max-width: 500px;
+            width: 100%;
+            max-width: 400px;
             text-align: center;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7);
             transform: scale(0.9);
-            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .modal-overlay.active .modal-content {
@@ -165,112 +165,104 @@
         }
 
         .modal-title {
-            font-size: 1.8rem;
+            font-size: 1.5rem;
             font-weight: 900;
-            margin-bottom: 15px;
-            background: linear-gradient(135deg, #a855f7, #6366f1);
+            margin-bottom: 12px;
+            background: linear-gradient(135deg, #c084fc, #6366f1);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
         .modal-body {
-            color: #cbd5e1;
-            font-size: 1.05rem;
+            color: #94a3b8;
+            font-size: 0.95rem;
             line-height: 1.6;
-            margin-bottom: 30px;
+            margin-bottom: 24px;
         }
 
         .close-modal {
             background: #a855f7;
             color: white;
             border: none;
-            padding: 12px 30px;
+            padding: 10px 24px;
             border-radius: 12px;
-            font-weight: 600;
+            font-weight: 700;
             cursor: pointer;
-            transition: background 0.3s ease;
+            width: 100%;
+            transition: background 0.2s;
         }
 
         .close-modal:hover {
             background: #9333ea;
         }
+
+        /* Ajustes específicos para móviles en vertical */
+        @media (max-width: 768px) {
+            .interactive-digit {
+                font-size: 6rem;
+            }
+            .action-btn {
+                padding: 10px 12px;
+                font-size: 0.75rem;
+                letter-spacing: 0.5px;
+            }
+        }
     </style>
 </head>
 <body>
 
-    <!-- Fondo dinámico interactivo -->
     <canvas id="bgCanvas"></canvas>
-    <div class="ambient-glow" id="ambientGlow"></div>
+    <div class="ambient-glow"></div>
 
-    <!-- Contenedor Principal -->
-    <div class="main-container">
-        <div class="number-group">
-            
-            <!-- Dígito 1 -->
-            <div class="digit-column" id="col1">
-                <div class="digit" data-value="1">1</div>
-                <button class="action-btn" onclick="openModal(1)">Explorar</button>
-            </div>
+    <!-- Zona interactiva donde flotan y se arrastran los números -->
+    <div id="physicsPlayground"></div>
 
-            <!-- Dígito 0 -->
-            <div class="digit-column" id="col2">
-                <div class="digit" data-value="0">0</div>
-                <button class="action-btn" onclick="openModal(2)">Sistemas</button>
-            </div>
-
-            <!-- Dígito 1 -->
-            <div class="digit-column" id="col3">
-                <div class="digit" data-value="1">1</div>
-                <button class="action-btn" onclick="openModal(3)">Cinemática</button>
-            </div>
-
-        </div>
+    <!-- Panel de 3 botones inferiores -->
+    <div class="bottom-nav">
+        <button class="action-btn" onclick="openModal(1)">Reiniciar</button>
+        <button class="action-btn" onclick="openModal(2)">Efectos</button>
+        <button class="action-btn" onclick="openModal(3)">Info</button>
     </div>
 
-    <!-- Ventana Modal Dinámica -->
+    <!-- Modal Dinámico -->
     <div class="modal-overlay" id="modalOverlay" onclick="closeModal()">
         <div class="modal-content" onclick="event.stopPropagation()">
             <h2 class="modal-title" id="modalTitle">Título</h2>
-            <p class="modal-body" id="modalText">Contenido de la sección...</p>
-            <button class="close-modal" onclick="closeModal()">Cerrar</button>
+            <p class="modal-body" id="modalText">Texto...</p>
+            <button class="close-modal" onclick="closeModal()">Entendido</button>
         </div>
     </div>
 
     <script>
-        // --- 1. SINTETIZADOR DE AUDIO PROFESIONAL (Web Audio API) ---
+        // --- 1. SINTETIZADOR DE AUDIO (Web Audio API) ---
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
         function playSound(type) {
-            if (audioCtx.state === 'suspended') {
-                audioCtx.resume();
-            }
+            if (audioCtx.state === 'suspended') audioCtx.resume();
             const osc = audioCtx.createOscillator();
-            const gainNode = audioCtx.createGain();
-            osc.connect(gainNode);
-            gainNode.connect(audioCtx.destination);
-
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
             const now = audioCtx.currentTime;
 
-            if (type === 'hover') {
+            if (type === 'pop') {
                 osc.type = 'sine';
-                osc.frequency.setValueAtTime(440, now);
-                osc.frequency.exponentialRampToValueAtTime(880, now + 0.08);
-                gainNode.gain.setValueAtTime(0.03, now);
-                gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
-                osc.start(now);
-                osc.stop(now + 0.08);
-            } else if (type === 'click') {
+                osc.frequency.setValueAtTime(200, now);
+                osc.frequency.exponentialRampToValueAtTime(600, now + 0.15);
+                gain.gain.setValueAtTime(0.15, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+                osc.start(now); osc.stop(now + 0.15);
+            } else if (type === 'explode') {
                 osc.type = 'triangle';
-                osc.frequency.setValueAtTime(220, now);
-                osc.frequency.exponentialRampToValueAtTime(110, now + 0.2);
-                gainNode.gain.setValueAtTime(0.1, now);
-                gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
-                osc.start(now);
-                osc.stop(now + 0.2);
+                osc.frequency.setValueAtTime(150, now);
+                osc.frequency.exponentialRampToValueAtTime(40, now + 0.3);
+                gain.gain.setValueAtTime(0.25, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+                osc.start(now); osc.stop(now + 0.3);
             }
         }
 
-        // --- 2. MOTOR DE PARTÍCULAS DE FONDO ---
+        // --- 2. FONDO DE PARTÍCULAS DE PROFUNDIDAD ---
         const canvas = document.getElementById('bgCanvas');
         const ctx = canvas.getContext('2d');
         let particles = [];
@@ -282,107 +274,202 @@
         window.addEventListener('resize', resizeCanvas);
         resizeCanvas();
 
-        class Star {
-            constructor() {
-                this.x = Math.random() * canvas.width;
-                this.y = Math.random() * canvas.height;
-                this.size = Math.random() * 1.5;
-                this.speedY = (Math.random() - 0.5) * 0.2;
-                this.speedX = (Math.random() - 0.5) * 0.2;
-                this.alpha = Math.random() * 0.7 + 0.3;
-            }
-            update() {
-                this.x += this.speedX;
-                this.y += this.speedY;
-                if (this.x < 0) this.x = canvas.width;
-                if (this.x > canvas.width) this.x = 0;
-                if (this.y < 0) this.y = canvas.height;
-                if (this.y > canvas.height) this.y = 0;
-            }
-            draw() {
-                ctx.fillStyle = `rgba(255, 255, 255, ${this.alpha})`;
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fill();
-            }
+        for (let i = 0; i < 50; i++) {
+            particles.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                size: Math.random() * 2,
+                speedY: (Math.random() - 0.5) * 0.3,
+                alpha: Math.random() * 0.5 + 0.2
+            });
         }
 
-        for (let i = 0; i < 80; i++) particles.push(new Star());
-
-        function animateStars() {
+        function animateBg() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            particles.forEach(p => { p.update(); p.draw(); });
-            requestAnimationFrame(animateStars);
+            particles.forEach(p => {
+                p.y += p.speedY;
+                if (p.y < 0) p.y = canvas.height;
+                if (p.y > canvas.height) p.y = 0;
+                ctx.fillStyle = `rgba(255, 255, 255, ${p.alpha})`;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fill();
+            });
+            requestAnimationFrame(animateBg);
         }
-        animateStars();
+        animateBg();
 
-        // --- 3. EFECTOS 3D DE RATÓN Y LUZ AMBIENTAL ---
-        const ambientGlow = document.getElementById('ambientGlow');
-        const digits = document.querySelectorAll('.digit');
+        // --- 3. SISTEMA INTERACTIVO DE NÚMEROS (Arrastrar, Inflar y Explotar) ---
+        const playground = document.getElementById('physicsPlayground');
 
-        window.addEventListener('mousemove', (e) => {
-            const x = e.clientX;
-            const y = e.clientY;
+        function spawnNumber(val, x, y) {
+            const el = document.createElement('div');
+            el.className = 'interactive-digit';
+            el.innerText = val;
+            
+            // Posición inicial centrada o en coordenadas específicas
+            const pWidth = playground.clientWidth;
+            const pHeight = playground.clientHeight;
+            
+            let posX = x !== undefined ? x : pWidth / 2 + (Math.random() * 100 - 50);
+            let posY = y !== undefined ? y : pHeight / 2 + (Math.random() * 100 - 50);
 
-            // Mover la luz ambiental suavemente siguiendo el cursor
-            ambientGlow.style.transform = `translate(${x - 300}px, ${y - 300}px)`;
+            el.style.left = `${posX}px`;
+            el.style.top = `${posY}px`;
 
-            // Efecto de inclinación 3D en los números
-            const centerX = window.innerWidth / 2;
-            const centerY = window.innerHeight / 2;
-            const rotateX = (y - centerY) / 25;
-            const rotateY = (centerX - x) / 25;
+            let scale = 1;
+            let isHolding = false;
+            let holdTimer = null;
+            let startX, startY;
 
-            digits.forEach((digit, index) => {
-                const depth = (index + 1) * 5;
-                digit.style.transform = `rotateX(${-rotateX}deg) rotateY(${rotateY}deg) translateZ(${depth}px)`;
-            });
+            // Funciones de control táctil y ratón
+            function startDrag(e) {
+                isHolding = true;
+                const clientX = e.clientX || e.touches[0].clientX;
+                const clientY = e.clientY || e.touches[0].clientY;
+                startX = clientX - el.offsetLeft;
+                startY = clientY - el.offsetTop;
+
+                // Iniciar temporizador de hinchado tipo globo
+                holdTimer = setInterval(() => {
+                    if (isHolding) {
+                        scale += 0.05;
+                        if (scale > 2.5) { // ¡Explosión por tamaño máximo!
+                            clearInterval(holdTimer);
+                            explodeNumber(el, scale);
+                        } else {
+                            el.style.transform = `scale(${scale})`;
+                            playSound('pop');
+                        }
+                    }
+                }, 100);
+
+                e.preventDefault();
+            }
+
+            function onDrag(e) {
+                if (!isHolding) return;
+                const clientX = e.clientX || e.touches[0].clientX;
+                const clientY = e.clientY || e.touches[0].clientY;
+                
+                el.style.left = `${clientX - startX}px`;
+                el.style.top = `${clientY - startY}px`;
+            }
+
+            function stopDrag() {
+                if (isHolding) {
+                    isHolding = false;
+                    clearInterval(holdTimer);
+                    // Si lo suelta antes de explotar, vuelve a su escala normal con rebote
+                    if (scale < 2.5) {
+                        scale = 1;
+                        el.style.transform = `scale(1)`;
+                    }
+                }
+            }
+
+            el.addEventListener('mousedown', startDrag);
+            window.addEventListener('mousemove', onDrag);
+            window.addEventListener('mouseup', stopDrag);
+
+            el.addEventListener('touchstart', startDrag);
+            window.addEventListener('touchmove', onDrag);
+            window.addEventListener('touchend', stopDrag);
+
+            playground.appendChild(el);
+        }
+
+        function explodeNumber(el, currentScale) {
+            playSound('explode');
+            const rect = el.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+
+            // Eliminar número actual
+            el.remove();
+
+            // Crear partículas de explosión visual
+            for (let i = 0; i < 20; i++) {
+                const particle = document.createElement('div');
+                particle.style.position = 'absolute';
+                particle.style.left = `${centerX}px`;
+                particle.style.top = `${centerY}px`;
+                particle.style.width = '6px';
+                particle.style.height = '6px';
+                particle.style.backgroundColor = Math.random() > 0.5 ? '#a855f7' : '#6366f1';
+                particle.style.borderRadius = '50%';
+                particle.style.zIndex = '15';
+                playground.appendChild(particle);
+
+                const angle = Math.random() * Math.PI * 2;
+                const speed = Math.random() * 80 + 20;
+                const destX = Math.cos(angle) * speed;
+                const destY = Math.sin(angle) * speed;
+
+                particle.animate([
+                    { transform: 'translate(0, 0) scale(1)', opacity: 1 },
+                    { transform: `translate(${destX}px, ${destY}px) scale(0)`, opacity: 0 }
+                ], {
+                    duration: 500,
+                    easing: 'cubic-bezier(0, .9, .57, 1)'
+                }).onfinish = () => particle.remove();
+            }
+
+            // Nacimiento de un nuevo número muy pequeño tras la explosión
+            setTimeout(() => {
+                const randomVal = Math.random() > 0.5 ? '1' : '0';
+                spawnNumber(randomVal, centerX - 30, centerY - 40);
+            }, 300);
+        }
+
+        // Inicializar el "101" al cargar la página distribuidos en pantalla
+        window.addEventListener('load', () => {
+            const w = window.innerWidth;
+            const h = window.innerHeight * 0.7;
+            spawnNumber('1', w * 0.25, h * 0.4);
+            spawnNumber('0', w * 0.45, h * 0.4);
+            spawnNumber('1', w * 0.65, h * 0.4);
         });
 
-        // Eventos interactivos en los dígitos
-        digits.forEach(digit => {
-            digit.addEventListener('mouseenter', () => playSound('hover'));
-            digit.addEventListener('click', (e) => {
-                playSound('click');
-                // Efecto visual dinámico al hacer clic en el número
-                digit.style.transform += ' scale(1.15)';
-                setTimeout(() => {
-                    digit.style.transform = digit.style.transform.replace(' scale(1.15)', '');
-                }, 200);
-            });
-        });
-
-        // --- 4. GESTIÓN DE LOS BOTONES Y MODALES ---
+        // --- 4. GESTIÓN DE MODALES DE LOS 3 BOTONES ---
         const modalOverlay = document.getElementById('modalOverlay');
         const modalTitle = document.getElementById('modalTitle');
         const modalText = document.getElementById('modalText');
 
         const modalData = {
             1: {
-                title: "Exploración Interactiva",
-                text: "Has accedido al primer nodo del sistema 101. Este espacio está diseñado con físicas fluidas, iluminación reactiva y micro-interacciones de alta gama."
+                title: "Reiniciar Entorno",
+                text: "Limpia la pantalla y restablece los números originales 101 a su posición central."
             },
             2: {
-                title: "Núcleo de Sistemas",
-                text: "El motor gráfico y de audio opera en tiempo real directamente en tu navegador mediante WebGL y Web Audio API, garantizando fluidez absoluta sin tiempos de carga."
+                title: "Modo Físicas y Globos",
+                text: "Mantén presionado cualquier número para inflarlo como un globo hasta que explote en fragmentos y nazca uno nuevo."
             },
             3: {
-                title: "Secuencia Cinemática",
-                text: "Próximamente podrás activar secuencias de inmersión visual completas con transiciones dinámicas de cámara y efectos de post-procesado."
+                title: "Sobre el Proyecto",
+                text: "Diseño optimizado para smartphones en vertical con animaciones fluidas por hardware y audio sintetizado nativo."
             }
         };
 
         function openModal(id) {
-            playSound('click');
+            if (id === 1) {
+                // Acción de reiniciar
+                playground.innerHTML = '';
+                const w = window.innerWidth;
+                const h = window.innerHeight * 0.7;
+                spawnNumber('1', w * 0.25, h * 0.4);
+                spawnNumber('0', w * 0.45, h * 0.4);
+                spawnNumber('1', w * 0.65, h * 0.4);
+                return;
+            }
             modalTitle.innerText = modalData[id].title;
             modalText.innerText = modalData[id].text;
             modalOverlay.classList.add('active');
         }
 
         function closeModal() {
-            playSound('click');
             modalOverlay.classList.remove('active');
         }
-    </style>
+    </script>
 </body>
 </html>
