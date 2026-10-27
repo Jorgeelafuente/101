@@ -23,7 +23,7 @@
             overflow-x: hidden;
         }
 
-        /* Altura de scroll generosa para controlar la cinemática milimétricamente */
+        /* Altura de scroll para controlar la cinemática */
         body {
             height: 500vh;
         }
@@ -49,7 +49,7 @@
             display: block;
         }
 
-        /* Indicador de desplazamiento limpio */
+        /* Indicador de desplazamiento */
         .scroll-hint {
             position: absolute;
             bottom: 30px;
@@ -123,11 +123,12 @@
             font-weight: 700;
         }
 
-        /* Segunda pestaña / Vista interna con los 3 botones */
+        /* Segunda pestaña / Mini pestaña flotante con los 3 botones */
         .sub-page {
             position: fixed;
             inset: 0;
-            background: #020503;
+            background: rgba(2, 5, 3, 0.95);
+            backdrop-filter: blur(20px);
             z-index: 100;
             display: flex;
             flex-direction: column;
@@ -163,7 +164,7 @@
             margin-bottom: 35px;
         }
 
-        /* Contenedor de los 3 botones principales */
+        /* Contenedor de los 3 botones principales: Horarios, Hogar y Juegos */
         .action-buttons-group {
             display: flex;
             gap: 15px;
@@ -171,29 +172,36 @@
             justify-content: center;
             margin-bottom: 30px;
             max-width: 600px;
+            width: 100%;
         }
 
         .action-btn {
             background: rgba(0, 255, 102, 0.05);
             border: 1px solid rgba(0, 255, 102, 0.3);
             color: #00ff66;
-            padding: 12px 24px;
-            border-radius: 8px;
+            padding: 16px 28px;
+            border-radius: 12px;
             font-weight: 700;
             font-family: 'Share Tech Mono', monospace;
             cursor: pointer;
-            letter-spacing: 1px;
+            letter-spacing: 1.5px;
             text-transform: uppercase;
             transition: all 0.3s ease;
-            font-size: 1rem;
+            font-size: 1.1rem;
+            flex: 1;
+            min-width: 140px;
         }
 
         .action-btn:hover {
             background: rgba(0, 255, 102, 0.2);
             border-color: #00ff66;
             box-shadow: 0 0 25px rgba(0, 255, 102, 0.5);
-            transform: translateY(-2px);
+            transform: translateY(-3px);
             color: #ffffff;
+        }
+
+        .action-btn:active {
+            transform: translateY(0);
         }
 
         .back-btn {
@@ -206,12 +214,75 @@
             cursor: pointer;
             transition: all 0.2s ease;
             font-family: 'Share Tech Mono', monospace;
+            margin-top: 10px;
         }
 
         .back-btn:hover {
             color: #fff;
             border-color: #fff;
             background: rgba(255, 255, 255, 0.05);
+        }
+
+        /* Modal emergente para cuando pulsas cualquiera de los 3 botones */
+        .detail-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            z-index: 150;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            padding: 20px;
+        }
+
+        .detail-modal.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .detail-content {
+            background: #020b05;
+            border: 1px solid #00ff66;
+            box-shadow: 0 0 30px rgba(0, 255, 102, 0.3);
+            border-radius: 16px;
+            padding: 30px;
+            max-width: 450px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .detail-title {
+            font-size: 1.8rem;
+            color: #00ff66;
+            margin-bottom: 15px;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 900;
+        }
+
+        .detail-text {
+            color: #cbd5e1;
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+
+        .close-detail-btn {
+            background: #00ff66;
+            color: #000;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: 'Share Tech Mono', monospace;
+        }
+
+        .close-detail-btn:hover {
+            background: #8affb0;
         }
     </style>
 </head>
@@ -229,18 +300,28 @@
         </div>
     </div>
 
-    <!-- Segunda Pestaña con los 3 Botones -->
+    <!-- Pestaña Emergente al pulsar el 101 -->
     <div class="sub-page" id="subPage">
-        <h1 class="sub-title">Terminal del Sistema 101</h1>
-        <p class="sub-text">Secuencia completada con éxito. Selecciona una de las tres opciones principales:</p>
+        <h1 class="sub-title">Menú Principal 101</h1>
+        <p class="sub-text">Selecciona una de las opciones para acceder a la sección correspondiente:</p>
         
+        <!-- Los 3 Botones Solicitados -->
         <div class="action-buttons-group">
-            <button class="action-btn" onclick="alert('Has pulsado el Botón 1 del sistema.')">Botón 1</button>
-            <button class="action-btn" onclick="alert('Has pulsado el Botón 2 del sistema.')">Botón 2</button>
-            <button class="action-btn" onclick="alert('Has pulsado el Botón 3 del sistema.')">Botón 3</button>
+            <button class="action-btn" onclick="openDetail('horarios')">Horarios</button>
+            <button class="action-btn" onclick="openDetail('hogar')">Hogar</button>
+            <button class="action-btn" onclick="openDetail('juegos')">Juegos</button>
         </div>
 
-        <button class="back-btn" onclick="closeSubPage()">Reiniciar Secuencia</button>
+        <button class="back-btn" onclick="closeSubPage()">Volver a la Cinematográfica</button>
+    </div>
+
+    <!-- Modal de detalle al pulsar Horarios, Hogar o Juegos -->
+    <div class="detail-modal" id="detailModal">
+        <div class="detail-content">
+            <h2 class="detail-title" id="detailTitle">Título</h2>
+            <p class="detail-text" id="detailText">Descripción de la sección seleccionada...</p>
+            <button class="close-detail-btn" onclick="closeDetail()">Cerrar</button>
+        </div>
     </div>
 
     <script>
@@ -259,7 +340,6 @@
 
         let scrollProgress = 0;
 
-        // Alfabeto de código binario y numérico dinámico
         const characters = "01010101019876543210ABCDEF";
         const fontSize = 18;
         const columns = Math.floor(canvas.width / fontSize);
@@ -269,7 +349,6 @@
             drops[i] = Math.floor(Math.random() * canvas.height);
         }
 
-        // Control de la cinemática mediante el desplazamiento (Scroll)
         window.addEventListener('scroll', () => {
             const scrollTop = window.scrollY;
             const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
@@ -288,7 +367,6 @@
             }
         });
 
-        // Bucle de renderizado visual
         function renderCyberCinematic() {
             ctx.fillStyle = 'rgba(0, 5, 2, 0.15)';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -310,7 +388,6 @@
                 drops[i] += 1 + (scrollProgress * 5);
             }
 
-            // Núcleo central que reacciona al desplazamiento
             const centerX = canvas.width / 2;
             const centerY = canvas.height / 2;
             const coreRadius = 50 + (scrollProgress * 300);
@@ -325,7 +402,6 @@
             ctx.stroke();
             ctx.restore();
 
-            // Explosión lumínica al llegar al final del scroll
             if (scrollProgress >= 0.85) {
                 const explosionProgress = (scrollProgress - 0.85) / 0.15;
                 const flashRadius = explosionProgress * Math.max(canvas.width, canvas.height);
@@ -347,7 +423,7 @@
         }
         renderCyberCinematic();
 
-        // Funciones de navegación de pestañas
+        // Control de navegación de la pestaña del 101
         function openSubPage() {
             subPage.classList.add('open');
         }
@@ -355,6 +431,36 @@
         function closeSubPage() {
             subPage.classList.remove('open');
             window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Lógica de los 3 botones: Horarios, Hogar y Juegos
+        const detailModal = document.getElementById('detailModal');
+        const detailTitle = document.getElementById('detailTitle');
+        const detailText = document.getElementById('detailText');
+
+        const sectionData = {
+            horarios: {
+                title: "📅 Horarios",
+                text: "Sección de Horarios. Aquí puedes consultar y gestionar los turnos, calendarios y la planificación del sistema."
+            },
+            hogar: {
+                title: "🏠 Hogar",
+                text: "Sección de Hogar. Panel de control domótico y dispositivos integrados del hogar inteligente."
+            },
+            juegos: {
+                title: "🎮 Juegos",
+                text: "Sección de Juegos. Acceso al área de entretenimiento, mini-juegos interactivos y rankings."
+            }
+        };
+
+        function openDetail(key) {
+            detailTitle.innerText = sectionData[key].title;
+            detailText.innerText = sectionData[key].text;
+            detailModal.classList.add('active');
+        }
+
+        function closeDetail() {
+            detailModal.classList.remove('active');
         }
     </script>
 </body>
