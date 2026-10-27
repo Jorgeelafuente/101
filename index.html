@@ -23,12 +23,10 @@
             overflow-x: hidden;
         }
 
-        /* Altura de scroll para controlar la cinemática */
         body {
             height: 500vh;
         }
 
-        /* Contenedor fijo de la cinemática */
         .cinema-container {
             position: fixed;
             top: 0;
@@ -49,7 +47,6 @@
             display: block;
         }
 
-        /* Indicador de desplazamiento */
         .scroll-hint {
             position: absolute;
             bottom: 30px;
@@ -75,7 +72,6 @@
             50% { opacity: 1; transform: translate(-50%, -6px); }
         }
 
-        /* Etapa Final: El Botón 101 */
         .final-stage {
             position: absolute;
             inset: 0;
@@ -123,7 +119,6 @@
             font-weight: 700;
         }
 
-        /* Segunda pestaña flotante */
         .sub-page {
             position: fixed;
             inset: 0;
@@ -154,7 +149,6 @@
             margin-bottom: 35px;
         }
 
-        /* Contenedor de los 3 botones principales */
         .action-buttons-group {
             display: flex;
             gap: 15px;
@@ -209,7 +203,6 @@
             background: rgba(255, 255, 255, 0.05);
         }
 
-        /* Modal / Pestaña emergente full-screen para secciones detalladas */
         .detail-modal {
             position: fixed;
             inset: 0;
@@ -251,7 +244,6 @@
             text-shadow: 0 0 15px rgba(0, 255, 102, 0.5);
         }
 
-        /* Estilo Cyberpunk para la Tabla de Horarios del Hogar */
         .schedule-table-wrapper {
             width: 100%;
             overflow-x: auto;
@@ -359,23 +351,19 @@
 </head>
 <body>
 
-    <!-- Contenedor Cinemático por Scroll -->
     <div class="cinema-container">
         <canvas id="cyberCanvas"></canvas>
         <div class="scroll-hint" id="scrollHint">↓ Desliza para avanzar ↓</div>
 
-        <!-- Etapa Final: El Botón 101 -->
         <div class="final-stage" id="finalStage">
             <div class="btn-101" onclick="openSubPage()">101</div>
             <div class="btn-subtitle">Núcleo activado • Pulsa para entrar</div>
         </div>
     </div>
 
-    <!-- Pestaña Emergente al pulsar el 101 -->
     <div class="sub-page" id="subPage">
         <p class="sub-text">Selecciona una de las opciones para acceder a la sección correspondiente</p>
         
-        <!-- Los 3 Botones Principales -->
         <div class="action-buttons-group">
             <button class="action-btn" onclick="openDetail('horarios')">Horarios</button>
             <button class="action-btn" onclick="openDetail('hogar')">Hogar</button>
@@ -385,14 +373,11 @@
         <button class="back-btn" onclick="closeSubPage()">Volver a la Cinematográfica</button>
     </div>
 
-    <!-- Modal de detalle al pulsar Horarios, Hogar o Juegos -->
     <div class="detail-modal" id="detailModal">
         <div class="detail-container">
             <h2 class="detail-title" id="detailTitle">ROTACIÓN DE TAREAS DEL HOGAR</h2>
             
-            <div id="modalDynamicContent" style="width: 100%;">
-                <!-- Aquí se inyecta la tabla cibernética dinámicamente -->
-            </div>
+            <div id="modalDynamicContent" style="width: 100%;"></div>
 
             <button class="close-detail-btn" onclick="closeDetail()">VOLVER</button>
         </div>
@@ -506,10 +491,10 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // --- ICONOS SVG VECTORIALES ADAPTADOS ---
+        // --- ICONOS VECTORIALES (Cocina actualizada con icono de sartén) ---
         const icons = {
             salon: `<svg class="task-icon" viewBox="0 0 24 24"><path d="M20,10V7A2,2 0 0,0 18,5H6A2,2 0 0,0 4,7V10A2,2 0 0,0 2,12V17H3.33L4,19H5L5.67,17H18.33L19,19H20L20.67,17H22V12A2,2 0 0,0 20,10M6,7H18V10H6V7M20,15H4V12H20V15Z"/></svg>`,
-            cocina: `<svg class="task-icon" viewBox="0 0 24 24"><path d="M18 2B1 1 0 0 1 19 3V21B1 1 0 0 1 18 22H6B1 1 0 0 1 5 21V3B1 1 0 0 1 6 2M7 4V10H17V4H7M7 12V20H17V12H7M9 5H11V7H9V5M9 14H11V18H9V14Z"/></svg>`,
+            cocina: `<svg class="task-icon" viewBox="0 0 24 24"><path d="M19,7H18V6A3,3 0 0,0 15,3H9A3,3 0 0,0 6,6V7H5A2,2 0 0,0 3,9V11A4,4 0 0,0 7,15V19A2,2 0 0,0 9,21H15A2,2 0 0,0 17,19V15A4,4 0 0,0 21,11V9A2,2 0 0,0 19,7M8,6A1,1 0 0,1 9,5H15A1,1 0 0,1 16,6V7H8V6M15,14.86V19H9V14.86C8.39,14.43 7.95,13.76 7.82,13H16.18C16.05,13.76 15.61,14.43 15,14.86M19,11A2,2 0 0,1 17,13H7A2,2 0 0,1 5,11V9H19V11Z"/></svg>`,
             exterior: `<svg class="task-icon" viewBox="0 0 24 24"><path d="M12,3L2,12H5V20H19V12H22L12,3M12,7.7C14.1,7.7 15.8,9.4 15.8,11.5C15.8,14.5 12,17.5 12,17.5C12,17.5 8.2,14.5 8.2,11.5C8.2,9.4 9.9,7.7 12,7.7Z"/></svg>`
         };
 
