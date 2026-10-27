@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>101 • Matrix Neural Interface</title>
+    <title>101 • Interactive Experience</title>
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         * {
@@ -23,7 +23,7 @@
             overflow-x: hidden;
         }
 
-        /* Altura de scroll generosa para controlar la cinemática matrix */
+        /* Altura de scroll generosa para controlar la cinemática milimétricamente */
         body {
             height: 500vh;
         }
@@ -43,13 +43,13 @@
             overflow: hidden;
         }
 
-        #matrixCanvas {
+        #cyberCanvas {
             width: 100%;
             height: 100%;
             display: block;
         }
 
-        /* Indicador de desplazamiento inicial */
+        /* Indicador de desplazamiento limpio */
         .scroll-hint {
             position: absolute;
             bottom: 30px;
@@ -123,7 +123,7 @@
             font-weight: 700;
         }
 
-        /* Segunda pestaña / Vista interna */
+        /* Segunda pestaña / Vista interna con los 3 botones */
         .sub-page {
             position: fixed;
             inset: 0;
@@ -163,7 +163,7 @@
             margin-bottom: 35px;
         }
 
-        /* Contenedor de los 3 botones finales */
+        /* Contenedor de los 3 botones principales */
         .action-buttons-group {
             display: flex;
             gap: 15px;
@@ -217,34 +217,34 @@
 </head>
 <body>
 
-    <!-- Contenedor Cinemático Matrix por Scroll -->
+    <!-- Contenedor Cinemático por Scroll -->
     <div class="cinema-container">
-        <canvas id="matrixCanvas"></canvas>
-        <div class="scroll-hint" id="scrollHint">>> Desliza para decodificar la matriz <<</div>
+        <canvas id="cyberCanvas"></canvas>
+        <div class="scroll-hint" id="scrollHint">↓ Desliza para avanzar ↓</div>
 
         <!-- Etapa Final: El Botón 101 -->
         <div class="final-stage" id="finalStage">
             <div class="btn-101" onclick="openSubPage()">101</div>
-            <div class="btn-subtitle">Núcleo decodificado • Pulsa para entrar</div>
+            <div class="btn-subtitle">Núcleo activado • Pulsa para entrar</div>
         </div>
     </div>
 
     <!-- Segunda Pestaña con los 3 Botones -->
     <div class="sub-page" id="subPage">
         <h1 class="sub-title">Terminal del Sistema 101</h1>
-        <p class="sub-text">Decodificación completada con éxito. Selecciona un protocolo del sistema:</p>
+        <p class="sub-text">Secuencia completada con éxito. Selecciona una de las tres opciones principales:</p>
         
         <div class="action-buttons-group">
-            <button class="action-btn" onclick="alert('Protocolo Alfa: Conexión cifrada establecida.')">Protocolo Alfa</button>
-            <button class="action-btn" onclick="alert('Protocolo Beta: Diagnóstico de nodos activo.')">Protocolo Beta</button>
-            <button class="action-btn" onclick="alert('Protocolo Omega: Secuencia de reinicio simulada.')">Protocolo Omega</button>
+            <button class="action-btn" onclick="alert('Has pulsado el Botón 1 del sistema.')">Botón 1</button>
+            <button class="action-btn" onclick="alert('Has pulsado el Botón 2 del sistema.')">Botón 2</button>
+            <button class="action-btn" onclick="alert('Has pulsado el Botón 3 del sistema.')">Botón 3</button>
         </div>
 
         <button class="back-btn" onclick="closeSubPage()">Reiniciar Secuencia</button>
     </div>
 
     <script>
-        const canvas = document.getElementById('matrixCanvas');
+        const canvas = document.getElementById('cyberCanvas');
         const ctx = canvas.getContext('2d');
         const scrollHint = document.getElementById('scrollHint');
         const finalStage = document.getElementById('finalStage');
@@ -259,8 +259,8 @@
 
         let scrollProgress = 0;
 
-        // Alfabeto digital Matrix
-        const characters = "0101010101XYZMATRIXSYNAPSECORE$_#><";
+        // Alfabeto de código binario y numérico dinámico
+        const characters = "01010101019876543210ABCDEF";
         const fontSize = 18;
         const columns = Math.floor(canvas.width / fontSize);
         const drops = [];
@@ -269,7 +269,7 @@
             drops[i] = Math.floor(Math.random() * canvas.height);
         }
 
-        // Control de la cinemática mediante el Scroll
+        // Control de la cinemática mediante el desplazamiento (Scroll)
         window.addEventListener('scroll', () => {
             const scrollTop = window.scrollY;
             const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
@@ -288,32 +288,29 @@
             }
         });
 
-        // Bucle de renderizado Matrix Cinemático
-        function renderMatrixCinematic() {
-            // Fondo semitransparente para efecto de estela
+        // Bucle de renderizado visual
+        function renderCyberCinematic() {
             ctx.fillStyle = 'rgba(0, 5, 2, 0.15)';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
             ctx.fillStyle = '#00ff66';
             ctx.font = fontSize + 'px "Share Tech Mono", monospace';
 
-            // Lluvia de código Matrix tradicional que acelera según el scroll
             for (let i = 0; i < drops.length; i++) {
                 const text = characters.charAt(Math.floor(Math.random() * characters.length));
                 const x = i * fontSize;
                 const y = drops[i] * fontSize;
 
-                // Cambiar brillo de algunos caracteres
                 ctx.fillStyle = Math.random() > 0.85 ? '#ffffff' : '#00ff66';
                 ctx.fillText(text, x, y);
 
                 if (y > canvas.height && Math.random() > 0.975) {
                     drops[i] = 0;
                 }
-                drops[i] += 1 + (scrollProgress * 5); // Velocidad influenciada por el scroll
+                drops[i] += 1 + (scrollProgress * 5);
             }
 
-            // Elemento cinemático central: Un núcleo de datos que se expande al hacer scroll
+            // Núcleo central que reacciona al desplazamiento
             const centerX = canvas.width / 2;
             const centerY = canvas.height / 2;
             const coreRadius = 50 + (scrollProgress * 300);
@@ -328,7 +325,7 @@
             ctx.stroke();
             ctx.restore();
 
-            // Efecto de explosión de datos al llegar al final del scroll
+            // Explosión lumínica al llegar al final del scroll
             if (scrollProgress >= 0.85) {
                 const explosionProgress = (scrollProgress - 0.85) / 0.15;
                 const flashRadius = explosionProgress * Math.max(canvas.width, canvas.height);
@@ -346,11 +343,11 @@
                 ctx.restore();
             }
 
-            requestAnimationFrame(renderMatrixCinematic);
+            requestAnimationFrame(renderCyberCinematic);
         }
-        renderMatrixCinematic();
+        renderCyberCinematic();
 
-        // Control de transición de la segunda pestaña
+        // Funciones de navegación de pestañas
         function openSubPage() {
             subPage.classList.add('open');
         }
